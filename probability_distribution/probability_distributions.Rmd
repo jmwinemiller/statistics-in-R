@@ -1,0 +1,213 @@
+---
+title: "Common Probability Distributions"
+author: "Jordan Winemiller"
+date: "July 10, 2017"
+output: 
+  html_document: default
+  pdf_document: default 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(rmarkdown)
+library(graphics)
+out_type <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+display_output <- function(dataset, out_type, filter_opt = 'none') {
+  
+  if (out_type == "html") {
+    out_table <- DT::datatable(dataset, filter = filter_opt)
+  } else {
+    out_table <- knitr::kable(dataset)
+  } 
+  
+  out_table
+}
+```
+## Discrete Distributions
+
+### Bernoulli
+The **Bernoulli distribution**, named for [Jacob Bernoulli](https://en.wikipedia.org/wiki/Jacob_Bernoulli), assigns probability to the outcomes of a single Bernoulli experiment---one where the only possible outcomes can be thought of as a "success" or a "failure" (e.g., a coin toss). Here, the random variable $x$ can take on the values 1 (success) with probability $p$, or 0 (failure) with probability $q = 1 - p$.  The plot below contains the pmf of two Bernoulli distributions.  The first (in gray) has a probability of success $p = 0.2$ and the second (in black) has a probability of success $p = 0.5$.  
+
+```{r}
+x <- 0:1
+plot(x, dbinom(x, 1, 0.2), type = "h", ylab = "f(x)", ylim = c(0,1), lwd = 8, col = "dark gray",
+      main = "Bernoulli(0.2)")
+lines(x, dbinom(x, 1, 0.5), type = "h", lwd = 2, col = "black")
+legend(0.7, 1.0, c("Bernoulli(0.2)","Bernoulli(0.5)"),col=c("dark gray","black"), lwd=c(8,2))
+
+```
+
+The Bernoulli experiment forms the foundation for many of the next discrete distributions.
+
+
+### Binomial
+The **binomial distribution** applies when we perform $n$ Bernoulli experiments and are interested in the total number of "successes" observed.  The outcome here, $y = \sum x_i$, where $P(x_i = 1) = p$ and $P(x_i = 0) = 1 - p$.  The plot below displays three binomial distributions, all for $n = 10$ Bernoulli trials: in gray, $p = 0.5$; in blue, $p = 0.1$; and in green, $p = 0.9$.  
+```{r}
+x <- seq(0, 10, 1)
+plot(x, dbinom(x, 10, 0.5), type = "h", ylab = "f(x)", lwd = 8, col = "dark gray", ylim = c(0,0.5),
+     main = "Binomial(10, 0.5) pmf")
+lines(x, dbinom(x, 10, 0.1), type = "h", lwd = 2, col = "blue")
+lines(x, dbinom(x, 10, 0.9), type = "h", lwd = 2, col = "green")
+legend(3, 0.5, c("Binomial(10,0.1)","Binomial(10,0.5)","Binomial(10,0.9)"), col=c("blue","dark gray","green"),lwd=c(2,8,2))
+
+```
+
+We can see the shifting of probability from low values for $p = 0.1$ to high values for $p = 0.9$.  This makes sense, as it becomes more likely with $p = 0.9$ to observe a success for an individual trial.  Thus, in 10 trials, more successes (e.g., 8, 9, or 10) are likely.  For $p = 0.5$, the number of successes are likely to be around 5 (e.g., half of the 10 trials).
+
+### Hypergeometric
+In the example I have below, I have set the number of balls in the urn to 10, 5 of which are white and 5 of which are black.  I have also fixed the number of balls drawn from the urn to 5.  Play around with the parameters and describe what you see.
+
+*As $M >= N$ the distribution shift to $p$ being more likely in early trials, where when $M << N$ the $p$ tends towards taking more trials for the success to occur.*
+
+```{r}
+x <- seq(0, 10, 1)
+plot(x, dhyper(x, 5, 5, 5), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Hypergeometric(5,10,5) pmf")
+plot(x, dhyper(x, 20, 25, 15), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Hypergeometric(20,55,15) pmf")
+plot(x, dhyper(x, 6, 4, 3), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Hypergeometric(6,4,3) pmf")
+plot(x, dhyper(x, 4, 6, 3), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Hypergeometric(4,6,3) pmf")
+
+```
+
+### Poisson
+See what happens if you increase $\lambda$? To 2? To 3?  
+
+*As $\lambda$ increases the mass function flats out with probability of f(x) getting smaller, and has a higher probability at less likely vaules.*
+
+*if we increase the scale from 0 to 10 with three new graphs, it becomes more apparent that this tends to be the case.*
+
+```{r}
+x <- seq(0, 5, 1)
+plot(x, dpois(x, 1), type = "h", ylab = "f(x)", main = "Poisson(1) pmf", lwd = 2)
+
+```
+
+```{r}
+x <- seq(0, 10, 1)
+plot(x, dpois(x, 1), type = "h", ylab = "f(x)", main = "Poisson(1) pmf", lwd = 2)
+plot(x, dpois(x, 2), type = "h", ylab = "f(x)", main = "Poisson(2) pmf", lwd = 2)
+plot(x, dpois(x, 3), type = "h", ylab = "f(x)", main = "Poisson(3) pmf", lwd = 2)
+```
+
+### Geometric
+We can see what happens to the geometric distribution if you vary the parameter $p$?  
+
+*As we vary $p$, if increase $p$ then the curve of the distribution is steeper with, and with more trials becoming less likely. Where as if we decrease the value of $p$ the number of trials is more likely.*
+
+```{r}
+x <- seq(0, 20, 1)
+plot(x, dgeom(x, 0.2), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Geometric(0.2) pmf")
+plot(x, dgeom(x, 0.5), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Geometric(0.5) pmf")
+plot(x, dgeom(x, 0.75), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Geometric(0.75) pmf")
+plot(x, dgeom(x, 0.1), type = "h", ylab = "f(x)", lwd = 2,
+    main = "Geometric(0.1) pmf")
+
+```
+
+### Negative Binomial
+The negative binomial I have below has set $r = 1$, so it's identical to the geometric above.  Now, when changing $r$ and we can see how it changes.
+
+*As $r$ changes the shape of the distribution changes, with $r > 1$ following a bell shape curve, and $r <= 1$ following an exponential curve. This is most like caused by it relationship with Gamma distribution.*
+
+```{r}
+x <- seq(0, 20, 1)
+plot(x, dnbinom(x,1,0.2), type = "h", ylab = "f(x)", lwd = 2,
+     main = "Negative Binomial(0.2) pmf")
+plot(x, dnbinom(x,2,0.2), type = "h", ylab = "f(x)", lwd = 2,
+     main = "Negative Binomial(0.2) pmf with r = 2")
+plot(x, dnbinom(x,0.5,0.2), type = "h", ylab = "f(x)", lwd = 2,
+     main = "Negative Binomial(0.2) pmf with r = 0.5")
+plot(x, dnbinom(x,3,0.2), type = "h", ylab = "f(x)", lwd = 2,
+     main = "Negative Binomial(0.2) pmf  with r = 3")
+
+```
+
+## Continuous Distributions
+
+### Exponential 
+Varying $\lambda$ parameter of the exponential distribution.
+
+*As $\lambda$ get closer to zero the curve becomes linear, and as $\lambda$ increases the curve sharply approaches the horizontal asymptote.*
+
+```{r}
+x <- seq(0, 10, 0.01)
+plot(x, dexp(x, 1), type = "l", ylab = "f(x)", lwd = 2, 
+    main = "Exponential(1) pdf")
+plot(x, dexp(x, 2), type = "l", ylab = "f(x)", lwd = 2, 
+    main = "Exponential(2) pdf")
+plot(x, dexp(x, 5), type = "l", ylab = "f(x)", lwd = 2, 
+    main = "Exponential(5) pdf")
+plot(x, dexp(x, 0.5), type = "l", ylab = "f(x)", lwd = 2, 
+    main = "Exponential(0.5) pdf")
+plot(x, dexp(x, 0.1), type = "l", ylab = "f(x)", lwd = 2, 
+    main = "Exponential(0.1) pdf")
+
+```
+
+### Normal
+Varying the $\sigma$ parameter; we see how the distribution changes.  If you make it too big, you may need to adjust the *x*-axis by making the sequence span a wider range than $-5$ to $5$.  You can use a trial-and-error approach to determine the proper limits for x for a given $\sigma$.
+
+**NOTE: Adjusted range to (-10, 10).**
+*As $\sigma$ increase the curve flats out making the $p$ greater for the area of values further away from the mean. Where as $\sigma$ with smaller values the range $p$ is closer to the mean.*
+
+```{r}
+x <- seq(-10, 10, 0.01)
+plot(x, dnorm(x, 0, 1), type = "l", ylab = "f(x)", main = "Normal(0, 1) pdf")
+plot(x, dnorm(x, 0, 0.5), type = "l", ylab = "f(x)", main = "Normal(0, 0.5) pdf")
+plot(x, dnorm(x, 0, 1.5), type = "l", ylab = "f(x)", main = "Normal(0, 1.5) pdf")
+plot(x, dnorm(x, 0, 3), type = "l", ylab = "f(x)", main = "Normal(0, 3) pdf")
+plot(x, dnorm(x, 0, 5), type = "l", ylab = "f(x)", main = "Normal(0, 5) pdf")
+```
+
+### Chisquare
+We can change the degrees of freedom and see how the shape of the distribution changes.
+
+*As the degrees of freedom increase the curve shifts right on the X axis, and curve flats producting lower values for $p$.*
+
+```{r}
+x <- seq(0, 20, 0.01)
+plot(x, dchisq(x, 6), type = "l", ylab = "f(x)", main = "Chi-square(6) pdf")
+plot(x, dchisq(x, 2), type = "l", ylab = "f(x)", main = "Chi-square(2) pdf")
+plot(x, dchisq(x, 10), type = "l", ylab = "f(x)", main = "Chi-square(10) pdf")
+plot(x, dchisq(x, 15), type = "l", ylab = "f(x)", main = "Chi-square(15) pdf")
+
+```
+
+### Students t
+
+Examining how the degrees of freedom change the shape of the student t distribution.
+
+*As the degrees of freedom increase the $p$ increase at the mean $\mu$ of the bell curve making the standard deviation $\sigma$ smaller.*
+
+```{r}
+x <- seq(-5, 5, 0.01)
+plot(x, dt(x, 6), type = "l", ylab = "f(x)", main = "Student's t(6) pdf")
+plot(x, dt(x, 2), type = "l", ylab = "f(x)", main = "Student's t(2) pdf")
+plot(x, dt(x, 10), type = "l", ylab = "f(x)", main = "Student's t(10) pdf")
+plot(x, dt(x, 15), type = "l", ylab = "f(x)", main = "Student's t(15) pdf")
+
+```
+
+### F
+
+See how the degrees of freedom (numerator and/or denominator) change the shape of the F distribution.
+
+*As the degrees of freedom for the numerator tend to or exceed the denominator the curve shifts to the left on the X axis tending to zero on the Y axis. In addition the curve starts to flatten. Where as the denominator being much larger shifts ot the right on the X axis*
+
+```{r}
+x <- seq(0, 6, 0.01)
+plot(x, df(x, 12, 15), type = "l", ylab = "f(x)", main = "F(12, 15) pdf")
+plot(x, df(x, 5, 3), type = "l", ylab = "f(x)", main = "F(5, 3) pdf")
+plot(x, df(x, 5, 5), type = "l", ylab = "f(x)", main = "F(5, 5) pdf")
+plot(x, df(x, 5, 25), type = "l", ylab = "f(x)", main = "F(5, 25) pdf")
+
+```
+
+
